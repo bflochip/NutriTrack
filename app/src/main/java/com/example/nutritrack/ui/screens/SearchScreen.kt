@@ -15,6 +15,7 @@ fun SearchScreen(viewModel: SearchViewModel, onNavigateBack: () -> Unit) {
     var query by remember { mutableStateOf("") }
     val results by viewModel.searchResults.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         OutlinedTextField(
@@ -33,6 +34,14 @@ fun SearchScreen(viewModel: SearchViewModel, onNavigateBack: () -> Unit) {
         if (isLoading) {
             CircularProgressIndicator()
         } else {
+            errorMessage?.let { message ->
+                Text(
+                    text = message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
             LazyColumn {
                 items(results) { food ->
                     Card(

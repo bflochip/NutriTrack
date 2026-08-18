@@ -19,13 +19,14 @@ abstract class NutriTrackDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): NutriTrackDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
+                // Re-check inside the lock: without this, two threads that both pass the
+                // outer null check each build a database and the second overwrites INSTANCE,
+                // leaving two open connections to the same file.
+                INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     NutriTrackDatabase::class.java,
                     "nutritrack_database"
-                ).build()
-                INSTANCE = instance
-                instance
+                ).build().also { INSTANCE = it }
             }
         }
     }
